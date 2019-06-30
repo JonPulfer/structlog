@@ -3,7 +3,9 @@ name = "structlog"
 version = "0.1.0"
 authors = ["Jonathan Pulfer <pulfer@gmail.com>"]
 edition = "2018"
-description = "Structured logging "
+description = "Structured logging based on key/value pairs"
+repository = ""
+
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
