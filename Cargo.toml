@@ -6,6 +6,7 @@ edition = "2018"
 description = "Structured logging based on key/value pairs"
 repository = "https://github.com/JonPulfer/structlog"
 readme = "README.md"
+license = "Apache-2.0"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
