@@ -1,0 +1,11 @@
+[package]
+name = "structlog"
+version = "0.1.0"
+authors = ["Jonathan Pulfer <pulfer@gmail.com>"]
+edition = "2018"
+description = "Structured logging "
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+serde = "1.0.94"
+serde_json = "1.0.39"
