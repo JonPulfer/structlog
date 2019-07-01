@@ -5,8 +5,8 @@ together, this crate might get you some way towards that. It won't help you make
 way to get messages into _such-and-such_ system. The primary outflow for these messages is as a `JSON` serialised structure that
 just includes the keys and values given to the logger.
 
-This is currently being built to use in a work project, so it will be updated and extended as needs arise. Contributions are welcome
-and encouraged. Please see the [Contribution guide](CONTRIBUTING.md) to find out how you can help.
+This is currently being built to use in another of my projects, so it will be updated and extended as needs arise. Contributions 
+are welcome and encouraged. Please see the [Contribution guide](CONTRIBUTING.md) to find out how you can help.
 
 ## Using as middleware
 

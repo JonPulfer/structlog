@@ -35,23 +35,23 @@ pub enum Event {
 }
 
 impl Event {
-    pub fn debug(event: impl Loggable) -> Event::DEBUG {
+    pub fn debug(event: impl Loggable) -> Event {
         Event::DEBUG(event)
     }
 
-    pub fn info(event: impl Loggable) -> Event::INFO {
+    pub fn info(event: impl Loggable) -> Event {
         Event::INFO(event)
     }
 
-    pub fn warn(event: impl Loggable) -> Event::WARN {
+    pub fn warn(event: impl Loggable) -> Event {
         Event::WARN(event)
     }
 
-    pub fn error(event: impl Loggable) -> Event::ERROR {
+    pub fn error(event: impl Loggable) -> Event {
         Event::ERROR(event)
     }
 
-    pub fn critical(event: impl Loggable) -> Event::CRITICAL {
+    pub fn critical(event: impl Loggable) -> Event {
         Event::CRITICAL(event)
     }
 }
