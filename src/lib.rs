@@ -54,9 +54,17 @@ impl Event {
     fn out(&self) -> String {
         let results = serde_json::to_string(self);
         match results {
-            Ok(result) => { result }
-            Err(_) => { String::new() }
+            Ok(result) => result,
+            Err(_) => String::new(),
         }
+    }
+
+    /// Chainable method to add a key:value pair into the event payload. This enables the event to
+    /// be enriched at multiple points during an operation to enable a better understanding of the
+    /// state of things at the time of the event.
+    pub fn add_field(&mut self, key: String, value: String) -> &mut Self {
+        self.payload.insert(key, value);
+        self
     }
 }
 
@@ -68,7 +76,32 @@ impl fmt::Display for Event {
 
 #[test]
 fn test_event_display() {
+    let mut expected = HashMap::new();
+    expected.insert(String::from("field"), String::from("value"));
+
     let mut ev = Event::new();
     ev.payload.insert("field".to_string(), "value".to_string());
-    println!("{}", ev);
+    assert_eq!(ev.payload, expected);
+}
+
+#[test]
+fn test_add_field() {
+    let mut expected = HashMap::new();
+    expected.insert(String::from("first_key"), String::from("first_value"));
+
+    let mut ev = Event::new();
+    ev.add_field(String::from("first_key"), String::from("first_value"));
+    assert_eq!(ev.payload, expected);
+}
+
+#[test]
+fn test_add_field_in_chain() {
+    let mut expected = HashMap::new();
+    expected.insert(String::from("first_key"), String::from("first_value"));
+    expected.insert(String::from("second_key"), String::from("second_value"));
+
+    let mut ev = Event::new();
+    ev.add_field(String::from("first_key"), String::from("first_value"))
+        .add_field(String::from("second_key"), String::from("second_value"));
+    assert_eq!(ev.payload, expected);
 }
