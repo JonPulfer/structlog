@@ -1,12 +1,13 @@
 [package]
 name = "structlog"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jonathan Pulfer <pulfer@gmail.com>"]
 edition = "2018"
 description = "Structured logging based on key/value pairs"
 repository = "https://github.com/JonPulfer/structlog"
 readme = "README.md"
 license = "Apache-2.0"
+maintenance = { status = "experimental" }
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
