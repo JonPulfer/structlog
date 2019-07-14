@@ -7,6 +7,8 @@ description = "Structured logging based on key/value pairs"
 repository = "https://github.com/JonPulfer/structlog"
 readme = "README.md"
 license = "Apache-2.0"
+
+[badges]
 maintenance = { status = "experimental" }
 
 [dependencies]
