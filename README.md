@@ -8,7 +8,27 @@ just includes the keys and values given to the logger.
 This is currently being built to use in another of my projects, so it will be updated and extended as needs arise. Contributions 
 are welcome and encouraged. Please see the [Contribution guide](CONTRIBUTING.md) to find out how you can help.
 
-## Using as middleware
+## Current usage options
 
-I am building this to use as middleware in web services using the Iron framework and will add that functionality here as
-modules.
+You create an `Event` which implement `fmt::Display` to output the JSON. Creating an event can either be done using
+a `parse()` like: -
+
+```rust
+
+let test_event: event::Event = "some event".parse().unwrap();
+
+```
+If you `println!("{}", test_event)` you would see something like: -
+
+```text
+{"attributes":{"message":"some event"},"created":"2020-03-01T13:32:31.845256Z"}
+```
+or you can use a pattern like: -
+
+```rust
+    let mut test_event = event::Event::new();
+    test_event.add_field(
+        String::from("message"),
+        String::from("this is the error message"),
+    );
+```

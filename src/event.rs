@@ -1,59 +1,21 @@
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
-
-/// Classic syslog style levels.
-pub enum Level {
-    DEBUG(Event),
-    INFO(Event),
-    WARN(Event),
-    ERROR(Event),
-    CRITICAL(Event),
-}
-
-impl Level {
-    pub fn debug(event: Event) -> Level {
-        Level::DEBUG(event)
-    }
-
-    pub fn info(event: Event) -> Level {
-        Level::INFO(event)
-    }
-
-    pub fn warn(event: Event) -> Level {
-        Level::WARN(event)
-    }
-
-    pub fn error(event: Event) -> Level {
-        Level::ERROR(event)
-    }
-
-    pub fn critical(event: Event) -> Level {
-        Level::CRITICAL(event)
-    }
-}
+use std::str;
 
 /// Simple event to record to the output channel.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Event {
-    payload: HashMap<String, String>,
-    created: chrono::DateTime<Utc>,
+    attributes: HashMap<String, String>,
+    pub created: DateTime<Utc>,
 }
 
 impl Event {
     pub fn new() -> Event {
         Event {
-            payload: HashMap::new(),
-            created: chrono::Local::now().with_timezone(&Utc),
-        }
-    }
-
-    fn out(&self) -> String {
-        let results = serde_json::to_string(self);
-        match results {
-            Ok(result) => result,
-            Err(_) => String::new(),
+            attributes: HashMap::new(),
+            created: Utc::now(),
         }
     }
 
@@ -61,14 +23,61 @@ impl Event {
     /// be enriched at multiple points during an operation to enable a better understanding of the
     /// state of things at the time of the event.
     pub fn add_field(&mut self, key: String, value: String) -> &mut Self {
-        self.payload.insert(key, value);
+        self.attributes.insert(key, value);
         self
     }
 }
 
 impl fmt::Display for Event {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.out())
+        let output = match serde_json::to_string(&self) {
+            Ok(serialised) => serialised,
+            Err(json_error) => {
+                let error_message = match serde_json::to_string(&json_error.to_string()) {
+                    Ok(serialised_error) => serialised_error,
+                    Err(total_fail_error) => {
+                        format!("unable to serialise to json: {}", total_fail_error)
+                    }
+                };
+                error_message
+            }
+        };
+        write!(f, "{}", output)
+    }
+}
+
+impl str::FromStr for Event {
+    type Err = ParseEventError;
+
+    fn from_str(message: &str) -> Result<Self, Self::Err> {
+        let mut attributes: HashMap<String, String> = HashMap::new();
+        attributes.insert(String::from("message"), message.to_string());
+        Ok(Event {
+            attributes,
+            created: Utc::now(),
+        })
+    }
+}
+
+impl From<&str> for Event {
+    fn from(message: &str) -> Event {
+        let mut attributes: HashMap<String, String> = HashMap::new();
+        attributes.insert(String::from("message"), message.to_string());
+        Event {
+            attributes,
+            created: Utc::now(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct ParseEventError {
+    message: String,
+}
+
+impl fmt::Display for ParseEventError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "unable to parse event: {}", self.message)
     }
 }
 
@@ -78,8 +87,9 @@ fn test_event_display() {
     expected.insert(String::from("field"), String::from("value"));
 
     let mut ev = Event::new();
-    ev.payload.insert("field".to_string(), "value".to_string());
-    assert_eq!(ev.payload, expected);
+    ev.attributes
+        .insert("field".to_string(), "value".to_string());
+    assert_eq!(ev.attributes, expected);
 }
 
 #[test]
@@ -89,7 +99,7 @@ fn test_add_field() {
 
     let mut ev = Event::new();
     ev.add_field(String::from("first_key"), String::from("first_value"));
-    assert_eq!(ev.payload, expected);
+    assert_eq!(ev.attributes, expected);
 }
 
 #[test]
@@ -101,5 +111,5 @@ fn test_add_field_in_chain() {
     let mut ev = Event::new();
     ev.add_field(String::from("first_key"), String::from("first_value"))
         .add_field(String::from("second_key"), String::from("second_value"));
-    assert_eq!(ev.payload, expected);
+    assert_eq!(ev.attributes, expected);
 }

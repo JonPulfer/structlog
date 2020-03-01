@@ -1,3 +1,27 @@
-mod drain;
 pub mod event;
-mod iron_logger;
+
+#[cfg(test)]
+mod test {
+
+    use super::event;
+
+    #[test]
+    fn test_simple_event() {
+        let mut test_event = event::Event::new();
+        test_event.add_field(
+            String::from("message"),
+            String::from("this is the error message"),
+        );
+        let expected_output = format!(
+            "{{\"attributes\":{{\"message\":\"this is the error message\"}},\"created\":{}}}",
+            serde_json::to_string(&test_event.created).unwrap()
+        );
+        assert_eq!(&test_event.to_string(), &expected_output);
+    }
+
+    #[test]
+    fn test_event_parse_from_string() {
+        let test_event: event::Event = "some event".parse().unwrap();
+        println!("{}", test_event);
+    }
+}
