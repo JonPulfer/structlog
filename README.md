@@ -19,7 +19,7 @@ a `parse()` like: -
 let test_event: event::Event = "some event".parse().unwrap();
 
 // To make it another level you can do: -
-let test_event_error: event::Event = "sonething bad happened".parse<event::Event>().unwrap().error();
+let test_event_error: event::Event = "something bad happened".parse<event::Event>().unwrap().error();
 ```
 
 or you can use: -
@@ -28,12 +28,12 @@ or you can use: -
     let mut test_event = event::Event::new();
     test_event.add_field(
         String::from("message"),
-        String::from("this is the error message"),
+        String::from("some useful message"),
     );
 ```
 
 If you `println!("{}", test_event)` you would see something like: -
 
 ```text
-{"attributes":{"message":"Some error message"},"created":"2021-01-30T20:41:08.883084Z","level":"INFO","severity":"INFO"}
+{"attributes":{"message":"some useful message"},"created":"2021-01-30T20:41:08.883084Z","level":"INFO","severity":"INFO"}
 ```
