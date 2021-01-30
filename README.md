@@ -10,20 +10,19 @@ are welcome and encouraged. Please see the [Contribution guide](CONTRIBUTING.md)
 
 ## Current usage options
 
-You create an `Event` which implement `fmt::Display` to output the JSON. Creating an event can either be done using
+You create an `Event` which implements `fmt::Display` to output the JSON. Creating an event can either be done using
 a `parse()` like: -
 
 ```rust
 
+// By default the event will be created with a level/severity of INFO.
 let test_event: event::Event = "some event".parse().unwrap();
 
+// To make it another level you can do: -
+let test_event_error: event::Event = "sonething bad happened".parse<event::Event>().unwrap().error();
 ```
-If you `println!("{}", test_event)` you would see something like: -
 
-```text
-{"attributes":{"message":"some event"},"created":"2020-03-01T13:32:31.845256Z"}
-```
-or you can use a pattern like: -
+or you can use: -
 
 ```rust
     let mut test_event = event::Event::new();
@@ -31,4 +30,10 @@ or you can use a pattern like: -
         String::from("message"),
         String::from("this is the error message"),
     );
+```
+
+If you `println!("{}", test_event)` you would see something like: -
+
+```text
+{"attributes":{"message":"Some error message"},"created":"2021-01-30T20:41:08.883084Z","level":"INFO","severity":"INFO"}
 ```

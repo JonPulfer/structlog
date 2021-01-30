@@ -1,14 +1,45 @@
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::error::Error;
 use std::fmt;
 use std::str;
+
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+enum Level {
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+}
+
+impl fmt::Display for Level {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Level::DEBUG => {
+                write!(f, "debug")
+            }
+            Level::ERROR => {
+                write!(f, "error")
+            }
+            Level::INFO => {
+                write!(f, "info")
+            }
+            Level::WARN => {
+                write!(f, "warn")
+            }
+        }
+    }
+}
 
 /// Simple event to record to the output channel.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Event {
     attributes: HashMap<String, String>,
     pub created: DateTime<Utc>,
+    level: Level,
+    severity: Level,
 }
 
 impl Event {
@@ -16,6 +47,8 @@ impl Event {
         Event {
             attributes: HashMap::new(),
             created: Utc::now(),
+            level: Level::INFO,
+            severity: Level::INFO,
         }
     }
 
@@ -25,6 +58,31 @@ impl Event {
     pub fn add_field(&mut self, key: String, value: String) -> &mut Self {
         self.attributes.insert(key, value);
         self
+    }
+
+    fn set_level(self, level: Level) -> Event {
+        Event {
+            attributes: self.attributes.clone(),
+            created: self.created.clone(),
+            level,
+            severity: level.clone(),
+        }
+    }
+
+    pub fn info(self) -> Event {
+        self.set_level(Level::INFO)
+    }
+
+    pub fn debug(self) -> Event {
+        self.set_level(Level::DEBUG)
+    }
+
+    pub fn warn(self) -> Event {
+        self.set_level(Level::WARN)
+    }
+
+    pub fn error(self) -> Event {
+        self.set_level(Level::ERROR)
     }
 }
 
@@ -55,6 +113,8 @@ impl str::FromStr for Event {
         Ok(Event {
             attributes,
             created: Utc::now(),
+            level: Level::INFO,
+            severity: Level::INFO,
         })
     }
 }
@@ -66,6 +126,21 @@ impl From<&str> for Event {
         Event {
             attributes,
             created: Utc::now(),
+            level: Level::INFO,
+            severity: Level::INFO,
+        }
+    }
+}
+
+impl From<Box<dyn Error>> for Event {
+    fn from(error: Box<dyn Error>) -> Event {
+        let mut attributes: HashMap<String, String> = HashMap::new();
+        attributes.insert(String::from("error"), error.to_string());
+        Event {
+            attributes,
+            created: Utc::now(),
+            level: Level::ERROR,
+            severity: Level::ERROR,
         }
     }
 }

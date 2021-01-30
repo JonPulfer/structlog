@@ -13,7 +13,7 @@ mod test {
             String::from("this is the error message"),
         );
         let expected_output = format!(
-            "{{\"attributes\":{{\"message\":\"this is the error message\"}},\"created\":{}}}",
+            "{{\"attributes\":{{\"message\":\"this is the error message\"}},\"created\":{},\"level\":\"INFO\",\"severity\":\"INFO\"}}",
             serde_json::to_string(&test_event.created).unwrap()
         );
         assert_eq!(&test_event.to_string(), &expected_output);
@@ -23,5 +23,11 @@ mod test {
     fn test_event_parse_from_string() {
         let test_event: event::Event = "some event".parse().unwrap();
         println!("{}", test_event);
+    }
+
+    #[test]
+    fn test_make_error() {
+        let test_event: event::Event = "something bad happened".parse::<event::Event>().unwrap().error();
+        assert_eq!(test_event.to_string().contains("ERROR"), true);
     }
 }

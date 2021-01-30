@@ -1,6 +1,6 @@
 [package]
 name = "structlog"
-version = "0.1.3"
+version = "0.1.5"
 authors = ["Jonathan Pulfer <pulfer@gmail.com>"]
 edition = "2018"
 description = "Structured logging based on key/value pairs"
