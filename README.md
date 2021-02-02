@@ -10,30 +10,32 @@ are welcome and encouraged. Please see the [Contribution guide](CONTRIBUTING.md)
 
 ## Current usage options
 
-You create an `Event` which implements `fmt::Display` to output the JSON. Creating an event can either be done using
+You create an `Event` which implements `fmt::Display` to output JSON for convenience. There are a few useful fields added
+when you create the event like a created timestamp and the caller location. Creating an event can either be done using
 a `parse()` like: -
 
 ```rust
 
 // By default the event will be created with a level/severity of INFO.
-let test_event: event::Event = "some event".parse().unwrap();
+let test_event = Event::from_str("some event");
 
 // To make it another level you can do: -
-let test_event_error: event::Event = "something bad happened".parse<event::Event>().unwrap().error();
+let mut test_event_error = Event::from_str("something bad happened");
+test_event_error.error();
 ```
 
 or you can use: -
 
 ```rust
-    let mut test_event = event::Event::new();
-    test_event.add_field(
-        String::from("message"),
-        String::from("some useful message"),
-    );
+let mut test_event = Event::new();
+test_event.add_field(
+    String::from("message"),
+    String::from("some useful message"),
+);
 ```
 
 If you `println!("{}", test_event)` you would see something like: -
 
 ```text
-{"attributes":{"message":"some useful message"},"created":"2021-01-30T20:41:08.883084Z","level":"INFO","severity":"INFO"}
+{"attributes":{"message":"Some useful message"},"created":"2021-02-02T20:04:06.949823Z","level":"INFO","severity":"INFO","caller":"tests/integration_tests.rs:5:18"}
 ```

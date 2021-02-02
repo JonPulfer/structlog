@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fmt;
 use std::str;
+use core::panic::Location;
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -40,15 +41,31 @@ pub struct Event {
     pub created: DateTime<Utc>,
     level: Level,
     severity: Level,
+    caller: String,
 }
 
 impl Event {
+    #[track_caller]
     pub fn new() -> Event {
         Event {
             attributes: HashMap::new(),
             created: Utc::now(),
             level: Level::INFO,
             severity: Level::INFO,
+            caller: Location::caller().to_string(),
+        }
+    }
+
+    #[track_caller]
+    pub fn from_str(message: &str) -> Event {
+        let mut attributes: HashMap<String, String> = HashMap::new();
+        attributes.insert(String::from("message"), String::from(message));
+        Event {
+            attributes,
+            created: Utc::now(),
+            level: Level::INFO,
+            severity: Level::INFO,
+            caller: Location::caller().to_string(),
         }
     }
 
@@ -60,29 +77,28 @@ impl Event {
         self
     }
 
-    fn set_level(self, level: Level) -> Event {
-        Event {
-            attributes: self.attributes.clone(),
-            created: self.created.clone(),
-            level,
-            severity: level.clone(),
-        }
+    fn set_level(&mut self, level: Level)  {
+        self.level = level;
     }
 
-    pub fn info(self) -> Event {
-        self.set_level(Level::INFO)
+    pub fn info(&mut self) -> &mut Event {
+        self.set_level(Level::INFO);
+        self
     }
 
-    pub fn debug(self) -> Event {
-        self.set_level(Level::DEBUG)
+    pub fn debug(&mut self) -> &mut Event {
+        self.set_level(Level::DEBUG);
+        self
     }
 
-    pub fn warn(self) -> Event {
-        self.set_level(Level::WARN)
+    pub fn warn(&mut self) -> &mut Event {
+        self.set_level(Level::WARN);
+        self
     }
 
-    pub fn error(self) -> Event {
-        self.set_level(Level::ERROR)
+    pub fn error(&mut self) -> &mut Event {
+        self.set_level(Level::ERROR);
+        self
     }
 }
 
@@ -115,6 +131,7 @@ impl str::FromStr for Event {
             created: Utc::now(),
             level: Level::INFO,
             severity: Level::INFO,
+            caller: Location::caller().to_string(),
         })
     }
 }
@@ -128,6 +145,7 @@ impl From<&str> for Event {
             created: Utc::now(),
             level: Level::INFO,
             severity: Level::INFO,
+            caller: Location::caller().to_string(),
         }
     }
 }
@@ -141,6 +159,7 @@ impl From<Box<dyn Error>> for Event {
             created: Utc::now(),
             level: Level::ERROR,
             severity: Level::ERROR,
+            caller: Location::caller().to_string(),
         }
     }
 }
