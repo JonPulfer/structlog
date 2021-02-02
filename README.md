@@ -12,7 +12,7 @@ are welcome and encouraged. Please see the [Contribution guide](CONTRIBUTING.md)
 
 You create an `Event` which implements `fmt::Display` to output JSON for convenience. There are a few useful fields added
 when you create the event like a created timestamp and the caller location. Creating an event can either be done using
-a `parse()` like: -
+a `Event::from_str()` like: -
 
 ```rust
 
