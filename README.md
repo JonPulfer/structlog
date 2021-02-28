@@ -2,6 +2,10 @@
 
 [![dependency status](https://deps.rs/repo/github/JonPulfer/structlog/status.svg)](https://deps.rs/repo/github/JonPulfer/structlog)
 ![docs](https://docs.rs/structlog/badge.svg)
+[![Latest Version]][crates.io]
+
+[Latest Version]: https://img.shields.io/crates/v/structlog.svg
+[crates.io]: https://crates.io/crates/structlog
 
 If you like to include useful pieces of information in log messages but don't want to use verbose text to join all the
 pieces together, this crate might get you some way towards that. It won't help you make your messages useful nor will it
